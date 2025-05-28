@@ -1,0 +1,4 @@
+# os: 배포할 서버의 OS, Linux or Windows 가능
+version: 0.0
+os: linux
+

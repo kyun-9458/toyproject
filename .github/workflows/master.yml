@@ -1,0 +1,42 @@
+# 배포 프로세스 naming
+name: deploy to toyproject
+on:
+  # 어떤 브랜치에서 어떤 동작 발생시 Github Actions를 실행할지 정의
+  # Github 원격 master branch에 push 발생하면 배포
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+  # job -> step -> action 순서로 정의
+  jobs:
+    # build 라는 job 정의
+    build:
+      # github에서 제공하는 ubuntu 환경에서 배포 실행
+      # runs-on 항목 아래부터 step 정의
+      runs-on: ubuntu-latest # 우분투 최신버전 설정
+      steps:
+        - name: checkout release
+          # uses: 이미 만들어진 action을 사용할 때
+          # actions/checkout@4는 본 레퍼지토리의 내용을 checkout 하여 runner 서버에 저장함
+          uses: actions/checkout@v4
+
+        - name: archive to tar.gz
+          run: tar cvfz ./kafka-consumer.tar.gz *
+
+        - name: AWS configure credentials
+          # AWS 접속시 필요한 키 셋팅하는 사전 정의된 action 사용
+          uses: aws-actions/confiture-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }} # AWS Access Key 암호화 처리
+            aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET_KEY }} # AWS Access Secret Key 암호화 처리
+            aws-region: ap-northeast-2
+
+        - name: upload to S3
+          run: aws s3 cp --region ap-northeast-2 ./toyproject.tar.gz s3://datalake-actions-deploy-kyun/toyproject/toyproject.tar.gz
+
+        - name: deploy with AWS codeDeploy
+          run: aws deploy create-deployment
+            --application-name datalake_deploy
+            --deployment-group-name toyproject_deploy
+            --s3-location bucket=datalake-actions-deploy-kyun,bundleType=tgz,key=kafka-consumer/kafka-consumer.tar.gz
