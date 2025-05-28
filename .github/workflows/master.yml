@@ -22,7 +22,7 @@ jobs:
        uses: actions/checkout@v4
 
      - name: archive to tar.gz
-       run: tar cvfz ./kafka-consumer.tar.gz *
+       run: tar cvfz ./toyproject.tar.gz * # 컴파일한 파일
 
      - name: AWS configure credentials
           # AWS 접속시 필요한 키 셋팅하는 사전 정의된 action 사용
