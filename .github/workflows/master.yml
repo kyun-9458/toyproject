@@ -39,4 +39,4 @@ jobs:
        run: aws deploy create-deployment
          --application-name datalake_deploy
          --deployment-group-name toyproject_deploy
-         --s3-location bucket=datalake-actions-deploy-kyun,bundleType=tgz,key=kafka-consumer/kafka-consumer.tar.gz
+         --s3-location bucket=datalake-actions-deploy-kyun,bundleType=tgz,key=toyproject/toyproject.tar.gz
