@@ -2,3 +2,24 @@
 version: 0.0
 os: linux
 
+files:
+  - source: /
+    destination: /src/toyproject
+
+# 위의 detination에 동일 파일 존재시 overwrite
+files_exists_behavior: OVERWRITE
+
+# permissions: file copy 이후 권한 지정
+#pattern, except 키워드를 통해 대상 상세 지정 가능
+permissions:
+  - object: /src/toyproject
+    owner: kafka
+    group: kafka
+    mode: 755
+
+# hooks를 통해 before/afetr 수행 동작 지정 가능
+hooks:
+  AfterInstall:
+    - location: deploy/afetr_install.sh
+      timeout: 120
+      runas: kafka
